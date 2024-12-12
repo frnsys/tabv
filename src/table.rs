@@ -44,7 +44,7 @@ impl TableView {
                 _ => Color::Rgb(32, 32, 32),
             };
             data.iter()
-                .map(Cell::from)
+                .map(|val| Cell::from(Text::from(val).alignment(Alignment::Right)))
                 .collect::<Row>()
                 .style(Style::new().fg(Color::Reset).bg(color))
         });

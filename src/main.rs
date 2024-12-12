@@ -3,7 +3,7 @@ use glob::glob;
 use tabv::{App, TableFile};
 
 fn find_csvs() -> Vec<TableFile> {
-    glob("./**/*.csv")
+    glob("./**/*.csv?")
         .expect("Failed to read glob pattern")
         .filter_map(|path| {
             path.ok().map(|path| {
