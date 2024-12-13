@@ -19,6 +19,19 @@ pub struct TableFile {
     pub records: Option<Vec<(String, Records)>>,
 }
 impl TableFile {
+    pub fn new(path: PathBuf) -> Self {
+        let name = path
+            .file_stem()
+            .expect("No valid file stem")
+            .to_string_lossy()
+            .to_string();
+        TableFile {
+            name,
+            path,
+            records: None,
+        }
+    }
+
     pub fn load(&mut self) -> Result<()> {
         match self.path.extension().and_then(|ext| ext.to_str()) {
             Some("csv") => self.load_csv(),
