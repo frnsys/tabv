@@ -85,8 +85,8 @@ impl TableView {
     }
 
     fn render_footer(&self, area: Rect, buf: &mut Buffer) {
-        let info_footer = Paragraph::new("foo")
-            .style(Style::new().fg(Color::Reset).bg(Color::Reset))
+        let info_footer = Paragraph::new("j/k:row h/l:col ;:find sheet")
+            .style(Style::new().fg(Color::DarkGray).bg(Color::Rgb(18, 18, 18)))
             .centered();
         info_footer.render(area, buf);
     }

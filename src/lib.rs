@@ -1,6 +1,6 @@
 mod app;
 mod file;
-mod table;
+mod views;
 
 pub use app::App;
 pub use file::TableFile;
