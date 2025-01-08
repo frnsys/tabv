@@ -20,6 +20,7 @@ pub struct App {
     file_views: Vec<FileView>,
     list_state: ListState,
     selected_file: usize,
+    maximized: bool,
 }
 impl App {
     pub fn new(files: Vec<TableFile>) -> Self {
@@ -32,6 +33,7 @@ impl App {
             file_views,
             selected_file: 0,
             finding: false,
+            maximized: false,
             list_state: ListState::default(),
             finder: FinderView::default(),
             state: AppState::default(),
@@ -123,6 +125,7 @@ impl App {
                         KeyCode::Char('l') | KeyCode::Right => view.next_column(),
                         KeyCode::Char('h') | KeyCode::Left => view.previous_column(),
                         KeyCode::Char('q') | KeyCode::Esc => self.quit(),
+                        KeyCode::Char('m') => self.maximized = !self.maximized,
                         KeyCode::Char(';') => self.finding = true,
                         _ => {}
                     }
@@ -163,26 +166,34 @@ impl App {
 impl Widget for &mut App {
     fn render(self, area: Rect, buf: &mut Buffer) {
         use Constraint::{Length, Min, Percentage};
-        let layout = Layout::horizontal([Length(32), Min(0)]);
-        let [sidebar_area, table_area] = layout.areas(area);
 
-        let sidebar = Layout::vertical([Percentage(50), Percentage(50), Length(1)]);
-        let [files_area, sheets_area, side_footer] = sidebar.areas(sidebar_area);
+        if self.maximized {
+            let layout = Layout::horizontal([Min(0)]);
+            let [table_area] = layout.areas(area);
+            let file = &mut self.file_views[self.selected_file];
+            file.render(table_area, buf);
+        } else {
+            let layout = Layout::horizontal([Length(32), Min(0)]);
+            let [sidebar_area, table_area] = layout.areas(area);
 
-        self.render_tabs(files_area, buf);
+            let sidebar = Layout::vertical([Percentage(50), Percentage(50), Length(1)]);
+            let [files_area, sheets_area, side_footer] = sidebar.areas(sidebar_area);
 
-        let file = &mut self.file_views[self.selected_file];
-        file.render_sheet_list(sheets_area, buf);
+            self.render_tabs(files_area, buf);
 
-        render_footer(side_footer, buf);
+            let file = &mut self.file_views[self.selected_file];
+            file.render_sheet_list(sheets_area, buf);
 
-        let block = Block::new()
-            .border_style(Color::Red)
-            .borders(Borders::LEFT)
-            .border_set(symbols::border::PLAIN);
-        let inner_table_area = block.inner(table_area);
-        block.render(table_area, buf);
-        file.render(inner_table_area, buf);
+            render_footer(side_footer, buf);
+
+            let block = Block::new()
+                .border_style(Color::Red)
+                .borders(Borders::LEFT)
+                .border_set(symbols::border::PLAIN);
+            let inner_table_area = block.inner(table_area);
+            block.render(table_area, buf);
+            file.render(inner_table_area, buf);
+        }
 
         if self.finding {
             self.finder.render(area, buf);
